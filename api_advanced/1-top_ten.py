@@ -13,12 +13,12 @@ def top_ten(subreddit):
 
     # If not a valid subreddit
     if response.status_code != 200:
-        print("OK")
+        print("OK",end="")
         return
 
     posts = response.json().get("data", {}).get("children", [])
     if not posts:
-        print("OK")
+        print("OK",end="")
         return
 
     for post in posts:

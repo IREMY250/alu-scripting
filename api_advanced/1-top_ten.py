@@ -1,34 +1,31 @@
 #!/usr/bin/python3
-"""Prints the title of the first 10 hot posts listed for a given subreddit"""
+"""Prints the titles of the first 10 hot posts for a given subreddit."""
 
 import requests
 
 
 def top_ten(subreddit):
-    """Main function"""
-    URL = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
+    """Queries Reddit API and prints titles of first 10 hot posts."""
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=10"
+    headers = {"User-Agent": "Mozilla/5.0"}
 
-    HEADERS = {"User-Agent": "PostmanRuntime/7.35.0"}
-    try:
-        RESPONSE = requests.get(URL, headers=HEADERS, allow_redirects=False)
+    response = requests.get(url, headers=headers, allow_redirects=False)
 
-        # Check if response is a redirect (invalid subreddit)
-        if RESPONSE.status_code in [301, 302, 303, 307, 308]:
-            print("OK")
-            return
+    
+    if response.status_code != 200:
+        print(None)
+        return
 
-        # Check if request was successful
-        if RESPONSE.status_code != 200:
-            print("OK")
-            return
+    data = response.json().get("data", {}).get("children", [])
 
-        HOT_POSTS = RESPONSE.json().get("data").get("children")
-        [print(post.get('data').get('title')) for post in HOT_POSTS]
-        print("OK")
-    except Exception:
-        print("OK")
+    if not data:
+        print(None)
+        return
+
+    for post in data:
+        print(post["data"]["title"])
 
 
 if __name__ == "__main__":
-    # Example usage - you can change this to any subreddit
+    
     top_ten("python")

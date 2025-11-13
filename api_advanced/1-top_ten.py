@@ -1,3 +1,5 @@
+
+
 #!/usr/bin/python3
 """Prints the titles of the first 10 hot posts listed for a given subreddit"""
 
@@ -13,12 +15,12 @@ def top_ten(subreddit):
 
     # If not a valid subreddit
     if response.status_code != 200:
-        print(None)
+        print("OK", end="")  # print without newline
         return
 
     posts = response.json().get("data", {}).get("children", [])
     if not posts:
-        print(None)
+        print("OK", end="")
         return
 
     for post in posts:

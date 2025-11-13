@@ -14,13 +14,11 @@ def top_ten(subreddit):
 
         # Check if response is a redirect (invalid subreddit)
         if RESPONSE.status_code in [301, 302, 303, 307, 308]:
-            print("OK")
+            print(None)
             return
 
-        # Check if request was successful
-        if RESPONSE.status_code != 200:
-            print("OK")
-            return
+        
+        
 
         HOT_POSTS = RESPONSE.json().get("data").get("children")
         [print(post.get('data').get('title')) for post in HOT_POSTS]

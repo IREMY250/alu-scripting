@@ -28,8 +28,12 @@ def top_ten(subreddit):
             print(post.get('data', {}).get('title'))
 
     except Exception:
-        # Catch any unexpected errors and print None
+        # Only print None if an unexpected error occurs
         print(None)
+if __name__ == "__main__":
+    import sys
 
-
-
+    if len(sys.argv) > 1:
+        top_ten(sys.argv[1])
+    else:
+        print("Usage: {} <subreddit>".format(sys.argv[0]))

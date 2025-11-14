@@ -6,37 +6,47 @@ import requests
 
 def top_ten(subreddit):
     """Main function"""
-    # URL to fetch the top 10 hot posts of the subreddit
     URL = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
 
-    # Custom User-Agent to avoid being blocked by Reddit
-    HEADERS = {"User-Agent": "Python:0x16reddit:1.0 (by /u/yourusername)"}
 
+
+    HEADERS = {"User-Agent": "PostmanRuntime/7.35.0"}
     try:
-        # Request to Reddit API with redirects disabled
         RESPONSE = requests.get(URL, headers=HEADERS, allow_redirects=False)
 
-        # If subreddit is invalid, Reddit returns 302 (redirect) or non-200
+        # 1. Check status code first (A must-have safety step)
         if RESPONSE.status_code != 200:
             print(None)
             return
 
-        # Extract the list of hot posts safely
-        HOT_POSTS = RESPONSE.json().get("data", {}).get("children", [])
+        # 2. Safely access nested data using an empty dictionary/list as default
+        # If "data" is missing, returns {}
+        data = RESPONSE.json().get("data", {})
+        # If "children" is missing, returns []
+        HOT_POSTS = data.get("children", [])
 
-        # Print each post title line by line
-        for post in HOT_POSTS:
-            print(post.get('data', {}).get('title'))
-
-    except Exception:
-        # Catch unexpected errors and print None
+        # 3. Safely extract titles in the list comprehension
+        titles = [post.get('data', {}).get('title') for post in HOT_POSTS]
+        
+        # Print each title individually (assuming this is the desired output format)
+        for title in titles:
+            print(title)
+            
+    except Exception as e:
+        # You can print the error 'e' to see what went wrong!
+        # print(f"An unexpected error occurred: {e}") 
         print(None)
 
-
 if __name__ == "__main__":
+
     import sys
 
+
+
     if len(sys.argv) > 1:
+
         top_ten(sys.argv[1])
+
     else:
+
         print("Usage: {} <subreddit>".format(sys.argv[0]))

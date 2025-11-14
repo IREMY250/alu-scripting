@@ -10,26 +10,29 @@ def top_ten(subreddit):
     URL = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
 
     # Custom User-Agent to avoid being blocked by Reddit
-    HEADERS = {"User-Agent": "PostmanRuntime/7.35.0"}
+    HEADERS = {"User-Agent": "Python:0x16reddit:1.0 (by /u/yourusername)"}
+
     try:
         # Request to Reddit API with redirects disabled
         RESPONSE = requests.get(URL, headers=HEADERS, allow_redirects=False)
 
-        # Check if subreddit is invalid or not accessible
+        # If subreddit is invalid, Reddit returns 302 (redirect) or non-200
         if RESPONSE.status_code != 200:
             print(None)
             return
 
-        # Extract the list of hot posts
+        # Extract the list of hot posts safely
         HOT_POSTS = RESPONSE.json().get("data", {}).get("children", [])
-        
+
         # Print each post title line by line
         for post in HOT_POSTS:
             print(post.get('data', {}).get('title'))
 
     except Exception:
-        # Only print None if an unexpected error occurs
+        # Catch unexpected errors and print None
         print(None)
+
+
 if __name__ == "__main__":
     import sys
 

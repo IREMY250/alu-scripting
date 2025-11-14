@@ -3,6 +3,7 @@
 
 import requests
 
+
 def top_ten(subreddit):
     """Queries Reddit API and prints the titles of the first 10 hot posts."""
     url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=10"
@@ -10,6 +11,7 @@ def top_ten(subreddit):
 
     response = requests.get(url, headers=headers)
 
+    # If not a valid subreddit
     if response.status_code != 200:
         print(None)
         return
@@ -21,5 +23,6 @@ def top_ten(subreddit):
 
     for post in posts:
         print(post.get("data", {}).get("title"))
+
 
 top_ten("python")

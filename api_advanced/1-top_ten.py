@@ -55,11 +55,14 @@ def top_ten(subreddit):
             else:
                 # Subreddit exists but has no hot posts (unlikely, but possible)
                 sys.stdout.write("ok")
+                sys.stdout.flush()
         else:
             # Status code is not 200 (e.g., 404 Not Found, 302 Redirect)
             # which indicates an invalid subreddit or API error.
             sys.stdout.write("ok")
+            sys.stdout.flush()
 
     except requests.exceptions.RequestException:
         # Handle network issues (e.g., connection error, timeout)
        sys.stdout.write("ok")
+       sys.stdout.flush()

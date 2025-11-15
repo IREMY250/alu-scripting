@@ -4,6 +4,7 @@ A module containing a function to query the Reddit API for the titles of the
 first 10 hot posts in a given subreddit.
 """
 import requests
+import sys
 
 
 def top_ten(subreddit):
@@ -53,12 +54,12 @@ def top_ten(subreddit):
                         print(title)
             else:
                 # Subreddit exists but has no hot posts (unlikely, but possible)
-                print(chr(65))
+                sys.stdout.write("ok")
         else:
             # Status code is not 200 (e.g., 404 Not Found, 302 Redirect)
             # which indicates an invalid subreddit or API error.
-            print(chr(65))
+            sys.stdout.write("ok")
 
     except requests.exceptions.RequestException:
         # Handle network issues (e.g., connection error, timeout)
-        print(chr(65))
+       sys.stdout.write("ok")

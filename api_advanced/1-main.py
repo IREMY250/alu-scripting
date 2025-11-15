@@ -1,23 +1,65 @@
 #!/usr/bin/python3
 """
-1-main: Script to test the top_ten function from 1-top_ten.py.
+A module containing a function to query the Reddit API for the titles of the
+first 10 hot posts in a given subreddit.
 """
-import sys
-
-# Ensure the module is in the path for import
-try:
-    # Attempt to import the function from the neighboring file
-    top_ten = __import__('1-top_ten').top_ten
-except ImportError:
-    # Fallback or error if the file is not found
-    print("Error: Could not find '1-top_ten.py'. Ensure it's in the same directory.")
-    sys.exit(1)
+import requests
 
 
-if __name__ == '__main__':
-    # Check if a subreddit argument was provided
-    if len(sys.argv) < 2:
-        print("Please pass an argument for the subreddit to search.")
-    else:
-        # Call the top_ten function with the provided argument
-        top_ten(sys.argv[1])
+def top_ten(subreddit):
+    """
+    Queries the Reddit API and prints the titles of the first 10 hot posts
+    listed for a given subreddit.
+
+    Args:
+        subreddit (str): The name of the subreddit to search.
+
+    If the subreddit is not valid or there is an API error, prints None.
+    Redirects are not followed to detect invalid subreddits correctly.
+    """
+    if not subreddit or not isinstance(subreddit, str):
+        print(None)
+        return
+
+    # Construct the URL with a limit of 10 posts
+    url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
+
+    # Reddit API requires a custom User-Agent to avoid rate-limiting.
+    # It should be descriptive of the application.
+    headers = {
+        'User-Agent': 'alx-advanced-api-project/1.0'
+    }
+
+    try:
+        # Disable redirects (allow_redirects=False) as per the requirement
+        # to detect invalid subreddits that redirect to search results.
+        response = requests.get(url,
+                                headers=headers,
+                                allow_redirects=False,
+                                timeout=5)
+
+        # Check for successful response (status code 200)
+        if response.status_code == 200:
+            data = response.json()
+
+            # Navigate the JSON structure to get the list of posts
+            posts = data.get('data', {}).get('children', [])
+
+            # Print the titles
+            if posts:
+                for post in posts:
+                    title = post.get('data', {}).get('title')
+                    if title:
+                        print(title)
+            else:
+                # Subreddit exists but has no hot posts
+                # (unlikely for a major subreddit, but possible)
+                print(None)
+        else:
+            # Status code is not 200 (e.g., 404 Not Found, 302 Redirect)
+            # which indicates an invalid subreddit or API error.
+            print(None)
+
+    except requests.exceptions.RequestException:
+        # Handle network issues (e.g., connection error, timeout)
+        print(None)

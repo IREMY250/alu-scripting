@@ -1,52 +1,64 @@
 #!/usr/bin/python3
-"""Prints the title of the first 10 hot posts listed for a given subreddit"""
-
+"""
+A module containing a function to query the Reddit API for the titles of the
+first 10 hot posts in a given subreddit.
+"""
 import requests
 
 
 def top_ten(subreddit):
-    """Main function"""
-    URL = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
+    """
+    Queries the Reddit API and prints the titles of the first 10 hot posts
+    listed for a given subreddit.
 
+    Args:
+        subreddit (str): The name of the subreddit to search.
 
-
-    HEADERS = {"User-Agent": "PostmanRuntime/7.35.0"}
-    try:
-        RESPONSE = requests.get(URL, headers=HEADERS, allow_redirects=False)
-
-        # 1. Check status code first (A must-have safety step)
-        if RESPONSE.status_code != 200:
-            print(None)
-            return
-
-        # 2. Safely access nested data using an empty dictionary/list as default
-        # If "data" is missing, returns {}
-        data = RESPONSE.json().get("data", {})
-        # If "children" is missing, returns []
-        HOT_POSTS = data.get("children", [])
-
-        # 3. Safely extract titles in the list comprehension
-        titles = [post.get('data', {}).get('title') for post in HOT_POSTS]
-        
-        # Print each title individually (assuming this is the desired output format)
-        for title in titles:
-            print(title)
-            
-    except Exception as e:
-        # You can print the error 'e' to see what went wrong!
-        # print(f"An unexpected error occurred: {e}") 
+    If the subreddit is not valid or there is an API error, prints None.
+    Redirects are not followed to detect invalid subreddits correctly.
+    """
+    if not subreddit or not isinstance(subreddit, str):
         print(None)
+        return
 
-if __name__ == "__main__":
+    # Construct the URL with a limit of 10 posts
+    url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
 
-    import sys
+    # Reddit API requires a custom User-Agent to avoid too many requests errors.
+    # It should be descriptive of the application.
+    headers = {
+        'User-Agent': 'alx-advanced-api-project/1.0'
+    }
 
+    try:
+        # Disable redirects (allow_redirects=False) as per the requirement
+        # to detect invalid subreddits that redirect to search results.
+        response = requests.get(url,
+                                headers=headers,
+                                allow_redirects=False,
+                                timeout=5)
 
+        # Check for successful response (status code 200)
+        if response.status_code == 200:
+            data = response.json()
 
-    if len(sys.argv) > 1:
+            # Navigate the JSON structure to get the list of posts
+            posts = data.get('data', {}).get('children', [])
 
-        top_ten(sys.argv[1])
+            # Print the titles
+            if posts:
+                for post in posts:
+                    title = post.get('data', {}).get('title')
+                    if title:
+                        print(title)
+            else:
+                # Subreddit exists but has no hot posts (unlikely, but possible)
+                print(None)
+        else:
+            # Status code is not 200 (e.g., 404 Not Found, 302 Redirect)
+            # which indicates an invalid subreddit or API error.
+            print(None)
 
-    else:
-
-        print("Usage: {} <subreddit>".format(sys.argv[0]))
+    except requests.exceptions.RequestException:
+        # Handle network issues (e.g., connection error, timeout)
+        print(None)

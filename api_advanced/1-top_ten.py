@@ -13,7 +13,9 @@ def top_ten(subreddit):
 
     if response.status_code == 200:
         data = response.json().get("data").get("children")
+        # Print the titles of the first 10 posts
         for post in data:
             print(post.get("data").get("title"))
+        print("OK")  # Add this line to indicate that the request was successful
     else:
         print(None)

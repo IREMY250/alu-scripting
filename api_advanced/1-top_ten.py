@@ -16,6 +16,8 @@ def top_ten(subreddit):
         # Print the titles of the first 10 posts
         for post in data:
             print(post.get("data").get("title"))
-        print("OK")  # Add this line to indicate that the request was successful
+        print(
+            "OK"
+        )  # Print "OK" only when the subreddit is valid and the data is fetched successfully
     else:
-        print(None)
+        print(None)  # Print None if the subreddit is invalid
